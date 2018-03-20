@@ -7,6 +7,7 @@ angular.module 'mnoEnterpriseAngular'
 
     vm.subscription = MnoeProvisioning.getSubscription()
     vm.isEditMode = !_.isEmpty(vm.subscription.custom_data)
+    vm.activeTab = vm.subscription.available_edit_actions[0]
 
     # The schema is contained in field vm.product.custom_schema
     #
@@ -15,16 +16,29 @@ angular.module 'mnoEnterpriseAngular'
     # reasonable number of passes (2 below + 1 in the sf-schema directive)
     # to resolve cyclic references
     #
-    MnoeMarketplace.findProduct(id: vm.subscription.product.id)
-      .then((response) -> JSON.parse(response.custom_schema))
-      .then((schema) -> schemaForm.jsonref(schema))
-      .then((schema) -> schemaForm.jsonref(schema))
-      .then((schema) -> vm.schema = schema)
+
+    getSubscription = () ->
+      # Must pass in the active tab, as this dictates which json-schema we will receive.
+      MnoeMarketplace.getProduct(vm.subscription.product.id, { editAction: vm.activeTab })
+        .then((response) -> JSON.parse(response.custom_schema))
+        .then((schema) -> schemaForm.jsonref(schema))
+        .then((schema) -> schemaForm.jsonref(schema))
+        .then((schema) -> vm.schema = schema)
 
     vm.submit = (form) ->
       return if form.$invalid
       MnoeProvisioning.setSubscription(vm.subscription)
       $state.go('home.provisioning.confirm')
 
+    vm.suspendable = if vm.subscription.status == 'suspended'
+      'mno_enterprise.templates.dashboard.provisioning.subscription.reactivate'
+    else
+      'mno_enterprise.templates.dashboard.provisioning.subscription.suspend'
+
+    vm.editButtonVisable = (editAction) ->
+      _.includes(vm.subscription.available_edit_actions, editAction)
+
+
+    getSubscription()
     return
   )
