@@ -17,13 +17,18 @@ angular.module 'mnoEnterpriseAngular'
     # to resolve cyclic references
     #
 
-    getSubscription = () ->
+    vm.getSubscription = () ->
+      vm.isLoading = true
+
       # Must pass in the active tab, as this dictates which json-schema we will receive.
       MnoeMarketplace.getProduct(vm.subscription.product.id, { editAction: vm.activeTab })
         .then((response) -> JSON.parse(response.custom_schema))
         .then((schema) -> schemaForm.jsonref(schema))
         .then((schema) -> schemaForm.jsonref(schema))
-        .then((schema) -> vm.schema = schema)
+        .then((schema) ->
+          vm.schema = schema
+          vm.isLoading = false
+          )
 
     vm.submit = (form) ->
       return if form.$invalid
@@ -39,6 +44,6 @@ angular.module 'mnoEnterpriseAngular'
       _.includes(vm.subscription.available_edit_actions, editAction)
 
 
-    getSubscription()
+    vm.getSubscription()
     return
   )
