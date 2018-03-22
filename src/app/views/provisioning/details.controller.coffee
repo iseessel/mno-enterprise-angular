@@ -1,5 +1,5 @@
 angular.module 'mnoEnterpriseAngular'
-  .controller('ProvisioningDetailsCtrl', ($state, MnoeMarketplace, MnoeProvisioning, schemaForm) ->
+  .controller('ProvisioningDetailsCtrl', ($state, MnoeMarketplace, MnoeProvisioning, schemaForm, EDIT_ACTIONS) ->
 
     vm = this
 
@@ -7,7 +7,9 @@ angular.module 'mnoEnterpriseAngular'
 
     vm.subscription = MnoeProvisioning.getSubscription()
     vm.isEditMode = !_.isEmpty(vm.subscription.custom_data)
-    vm.activeTab = vm.subscription.available_edit_actions[0]
+    vm.availableEditActions = vm.subscription.available_edit_actions
+    # Set default edit action
+    vm.activeTab = vm.availableEditActions[0]
 
     # The schema is contained in field vm.product.custom_schema
     #
@@ -32,17 +34,15 @@ angular.module 'mnoEnterpriseAngular'
 
     vm.submit = (form) ->
       return if form.$invalid
+      vm.subscription.editAction = vm.activeTab
       MnoeProvisioning.setSubscription(vm.subscription)
       $state.go('home.provisioning.confirm')
 
-    vm.suspendable = if vm.subscription.status == 'suspended'
-      'mno_enterprise.templates.dashboard.provisioning.subscription.reactivate'
-    else
-      'mno_enterprise.templates.dashboard.provisioning.subscription.suspend'
-
-    vm.editButtonVisable = (editAction) ->
-      _.includes(vm.subscription.available_edit_actions, editAction)
-
+    vm.editButtonText = (editAction) ->
+      if editAction == 'SUSPEND' && vm.subscription.status == 'suspended'
+        EDIT_ACTIONS['REACTIVATE']
+      else
+        EDIT_ACTIONS[editAction]
 
     vm.getSubscription()
     return

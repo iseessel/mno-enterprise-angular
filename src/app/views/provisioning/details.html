@@ -1,18 +1,9 @@
 <div id="provisioning-details">
   <h1 translate>mno_enterprise.templates.dashboard.provisioning.details.title</h1>
-  <div class="subscription-provisioning-details">
+  <div ng-if="vm.availableEditActions" class="subscription-provisioning-details">
     <div uib-tabset active="vm.activeTab">
-      <div uib-tab index="'EDIT'" ng-click="vm.getSubscription()" ng-if="vm.editButtonVisable('EDIT')">
-        <div uib-tab-heading>{{ 'mno_enterprise.templates.dashboard.provisioning.subscription.edit' | translate }}</div>
-      </div>
-      <div uib-tab index="'CHANGE'" ng-click="vm.getSubscription()" ng-if="vm.editButtonVisable('CHANGE')">
-        <div uib-tab-heading>{{ 'mno_enterprise.templates.dashboard.provisioning.subscription.change' | translate }}</div>
-      </div>
-      <div uib-tab index="'RENEW'" ng-click="vm.getSubscription()" ng-if="vm.editButtonVisable('RENEW')">
-        <div uib-tab-heading>{{ 'mno_enterprise.templates.dashboard.provisioning.subscription.renew' | translate }}</div>
-      </div>
-      <div uib-tab index="'SUSPEND'" ng-click="vm.getSubscription()" ng-if="vm.editButtonVisable('SUSPEND')">
-        <div uib-tab-heading>{{ 'mno_enterprise.templates.dashboard.provisioning.subscription.suspend' | translate }}</div>
+      <div ng-repeat="editAction in vm.availableEditActions" uib-tab index="editAction" ng-click="vm.getSubscription()">
+        <div uib-tab-heading>{{ vm.editButtonText(editAction) | translate }}</div>
       </div>
     </div>
   </div>
