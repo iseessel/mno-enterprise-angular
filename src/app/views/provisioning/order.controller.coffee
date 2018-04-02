@@ -7,7 +7,7 @@ angular.module 'mnoEnterpriseAngular'
 
     orgPromise = MnoeOrganizations.get()
     prodsPromise = MnoeMarketplace.getProducts()
-    initPromise = MnoeProvisioning.initSubscription({productNid: $stateParams.nid, subscriptionId: $stateParams.id})
+    initPromise = MnoeProvisioning.initSubscription({productNid: $stateParams.nid, subscriptionId: $stateParams.id, editing: $stateParams.editing})
 
     $q.all({organization: orgPromise, products: prodsPromise, subscription: initPromise}).then(
       (response) ->
@@ -34,9 +34,9 @@ angular.module 'mnoEnterpriseAngular'
     vm.next = (subscription) ->
       MnoeProvisioning.setSubscription(subscription)
       if vm.subscription.product.custom_schema?
-        $state.go('home.provisioning.additional_details')
+        $state.go('home.provisioning.additional_details', {id: $stateParams.id, nid: $stateParams.nid})
       else
-        $state.go('home.provisioning.confirm')
+        $state.go('home.provisioning.confirm', {id: $stateParams.id, nid: $stateParams.nid})
 
     # Return true if the plan has a dollar value
     vm.pricedPlan = (plan) ->
