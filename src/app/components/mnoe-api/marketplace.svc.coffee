@@ -27,7 +27,7 @@ angular.module 'mnoEnterpriseAngular'
     # Using this syntax will not trigger the data extraction in MnoeApiSvc
     # as the /marketplace payload isn't encapsulated in "{ marketplace: categories {...}, apps {...} }"
     marketplacePromises = []
-    @getApps = ->
+    @getMarketplace = ->
       params = {organization_id: MnoeOrganizations.selectedId}
       paramsKey = JSON.stringify(params)
       return marketplacePromises[paramsKey] if marketplacePromises[paramsKey]?
@@ -53,17 +53,6 @@ angular.module 'mnoEnterpriseAngular'
       _self.getProducts().then(
         (response) ->
           _.find(response.products, (a) -> a.id == id || a.nid == nid)
-      )
-
-    localProductsPromise = []
-    @getLocalProducts = (limit, offset, sort, params = {}) ->
-      params['organization_id'] = MnoeOrganizations.selectedId
-      params['where[local]'] = 'true'
-      paramsKey = JSON.stringify([limit, offset, sort, params])
-      return localProductsPromise[paramsKey] if localProductsPromise[paramsKey]?
-      localProductsPromise[paramsKey] = MnoeApiSvc.all('products').getList(params).then(
-        (response) ->
-          _transform_products(response.plain())
       )
 
     @getProduct = (productId) ->
