@@ -18,10 +18,18 @@ angular.module 'mnoEnterpriseAngular'
         vm.searchTerm = ''
         vm.isMarketplaceCompare = MnoeConfig.isMarketplaceComparisonEnabled()
         vm.showCompare = false
-        vm.nbAppsToCompare = 0
-        vm.appState = if vm.publicPage then "public.product" else "home.marketplace.product"
+        vm.nbProductsToCompare = 0
+        vm.productState = if vm.publicPage then "public.product" else "home.marketplace.product"
         vm.displayAll = {label: "", active: 'active'}
+        vm.appOrProduct = (product) ->
+          if product.app_id
+            "({appId: '#{product.app_id}', productNid: '#{product.nid}'})"
+          else
+            "({productId: '#{product.id}', productNid: '#{product.nid}'})"
+        vm.productRef = (product) ->
+          vm.productState + vm.appOrProduct(product)
         vm.selectedPublicCategory = vm.displayAll
+
         vm.initialize()
       #====================================
       # Scope Management
