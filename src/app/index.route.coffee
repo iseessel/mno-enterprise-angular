@@ -23,7 +23,7 @@ angular.module 'mnoEnterpriseAngular'
       .state 'public.product',
         data:
           pageTitle: "Product Preview"
-        url: '/product/?productId?appId'
+        url: '/product/:productId'
         templateUrl: 'app/components/mno-product/mno-product.html'
         controller: 'mnoProduct'
         controllerAs: 'vm'
@@ -147,7 +147,7 @@ angular.module 'mnoEnterpriseAngular'
         .state 'home.marketplace.product',
           data:
             pageTitle:'Marketplace'
-          url: '^/marketplace/?productNid?appId?productId'
+          url: '^/marketplace/:productId'
           views: '@home':
             templateUrl: 'app/components/mno-products/mno-product.html',
             controller: 'mnoProduct'

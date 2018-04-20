@@ -1,6 +1,6 @@
 angular.module 'mnoEnterpriseAngular'
-  .controller('mnoApp',($q, $scope, $stateParams, $state, $sce, $window, $uibModal, $anchorScroll,
-  $location, isPublic, parentState, toastr, MnoeMarketplace, MnoeOrganizations, MnoeCurrentUser, MnoeAppInstances, MnoConfirm, MnoeConfig, ProvisioningHelper) ->
+  .controller('mnoProduct',($q, $scope, $stateParams, $state, $sce, $window, $uibModal, $anchorScroll,
+  $location, isPublic, parentState, toastr, MnoeMarketplace, MnoeOrganizations, MnoeCurrentUser, MnoConfirm, MnoeConfig, ProvisioningHelper) ->
 
     vm = this
     #====================================
@@ -13,7 +13,7 @@ angular.module 'mnoEnterpriseAngular'
     vm.app = {}
     vm.searchWord = ""
     # The already installed app instance of the app, if any
-    vm.appInstance = null
+    vm.productInstalled = null
     # An already installed app, conflicting with the app because it contains a common subcategory
     # that is not multi instantiable, if any
     vm.conflictingApp = null
@@ -37,44 +37,57 @@ angular.module 'mnoEnterpriseAngular'
 
     vm.pricedPlan = ProvisioningHelper.pricedPlan
 
-    getPricingPlans = (app) ->
-      if vm.isPriceShown
-        plans = vm.app.pricing_plans
-        currency = MnoeConfig.marketplaceCurrency()
-        vm.pricing_plans = plans[currency] || plans.AUD || plans.default
-
     # Public initialization - app only, without considering reviews/org
-    MnoeMarketplace.getApps().then(
-      (response) ->
-        apps = response.apps
+    # MnoeMarketplace.getApps().then(
+    #   (response) ->
+    #     apps = response.apps
+    #
+    #     # App to be displayed
+    #     appId = $stateParams.appId
+    #     vm.app = _.findWhere(apps, { nid: appId })
+    #     vm.app ||= _.findWhere(apps, { id:  appId })
+    #
+    #     $state.go(parentState) unless vm.app?
+    #     vm.isLoading = false
+    #   )
 
-        # App to be displayed
-        appId = $stateParams.appId
-        vm.app = _.findWhere(apps, { nid: appId })
-        vm.app ||= _.findWhere(apps, { id:  appId })
+    #====================================
+    # Pricings
+    #====================================
+    # Return true if the plan has a dollar value
+    vm.pricedPlan = ProvisioningHelper.pricedPlan
 
-        # Init Pricing Plans
-        getPricingPlans(vm.app)
+    pricingPlans = (pricingPlans, currency) ->
+      _.map(pricingPlans, (pricingPlan) ->
+        return pricingPlan unless vm.pricedPlan(pricingPlan)
+        # If its a pricedPlan, only show prices of appropriate currency.
+        pricingPlans.prices = _.filter(pricingPlans.prices, (price) ->
+          price.currency == curency
+        )
 
-        $state.go(parentState) unless vm.app?
-        vm.isLoading = false
+        pricingPlan
       )
 
     #====================================
     # Scope Management
     #====================================
-    vm.initialize = (app, appInstance, product) ->
+
+    vm.initialize = (product) ->
       # Variables initialization
       vm.userId = MnoeCurrentUser.user.id
       vm.adminRole = MnoeCurrentUser.user.admin_role
 
       # Init current app and app instance
-      vm.app = app
-      vm.appInstance = appInstance
+      vm.product = product
+      vm.productInstalled = !_.isEmpty(product.productInstances)
 
       # Is the product externally provisioned
       vm.isExternallyProvisioned = (vm.isProvisioningEnabled && product?.externally_provisioned)
 
+      # Init pricing plans
+      currency = MnoeConfig.marketplaceCurrency()
+      vm.pricing_plan =
+      # Get the user role in this organization
       MnoeOrganizations.get().then((response) -> vm.user_role = response.current_user.role)
 
       # Init initials reviews if enabled
@@ -443,30 +456,10 @@ angular.module 'mnoEnterpriseAngular'
       if val?
         vm.isLoading = true
 
-        productPromise = if MnoeConfig.isProvisioningEnabled() then MnoeMarketplace.getProducts() else $q.resolve()
-
-        # Retrieve the apps and if any the current app instance
-        $q.all(
-          marketplace: MnoeMarketplace.getApps(),
-          appInstances: MnoeAppInstances.getAppInstances(),
-          products: productPromise
-        ).then(
+        # Retrieve the product and if any the current product instance
+        MnoeMarketplace.getProduct($stateParams.productId).then(
           (response) ->
-            apps = response.marketplace.apps
-            appInstances = response.appInstances
-            products = response.products?.products
-
-            # App to be displayed
-            appId = $stateParams.appId
-            app = _.findWhere(apps, { nid: appId })
-            app ||= _.findWhere(apps, { id:  appId })
-
-            $state.go(parentState) unless app?
-
-            # Find if we already have it
-            appInstance = _.find(appInstances, { app_nid: app.nid })
-            product = _.find(products, { nid: app.nid })
-            vm.initialize(app, appInstance, product)
+            vm.initialize(response)
         )
 
     return
