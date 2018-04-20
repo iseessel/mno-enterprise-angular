@@ -9,7 +9,7 @@
     <!-- Marketplace nav -->
     <div class="row">
       <div class="marketplace-nav" ng-hide="$ctrl.publicPage">
-        <div class="col-sm-4">
+        <div ng-hide="$ctrl.isLocal" class="col-sm-4">
           <select class="form-control" ng-model="$ctrl.selectedCategory" ng-options="c for c in $ctrl.categories" ng-change="$ctrl.searchTerm = ''">
             <option value=''>{{ 'mno_enterprise.templates.dashboard.marketplace.index.select_all' | translate }}</option>
           </select>

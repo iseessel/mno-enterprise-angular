@@ -1,7 +1,6 @@
 # Service for the listing of Apps on the Markeplace
 # MnoeMarketplace.getList()
 
-# .getApps()
 # => GET /mnoe/jpi/v1/marketplace
 # Return the list off apps and categories
 #   {categories: [], apps: []}
@@ -36,7 +35,7 @@ angular.module 'mnoEnterpriseAngular'
       )
 
     @getProduct = (productId) ->
-      MnoeApiSvc.one('/products', productId).get()
+      MnoeApiSvc.one('/products', productId).get().then((response) -> response.plain())
 
     @getReview = (appId, reviewId) ->
       MnoeApiSvc.one('marketplace', appId).one('app_reviews', parseInt(reviewId)).get()

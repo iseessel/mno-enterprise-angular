@@ -57,16 +57,19 @@ angular.module 'mnoEnterpriseAngular'
     # Return true if the plan has a dollar value
     vm.pricedPlan = ProvisioningHelper.pricedPlan
 
-    pricingPlans = (pricingPlans, currency) ->
-      _.map(pricingPlans, (pricingPlan) ->
+    vm.pricingPlans = () ->
+      _.map(vm.product.pricing_plans, (pricingPlan) ->
         return pricingPlan unless vm.pricedPlan(pricingPlan)
         # If its a pricedPlan, only show prices of appropriate currency.
-        pricingPlans.prices = _.filter(pricingPlans.prices, (price) ->
-          price.currency == curency
+        pricingPlan.prices = _.filter(pricingPlan.prices, (price) ->
+          price.currency == vm.currency
         )
 
         pricingPlan
       )
+
+    vm.showNoPricingFound = (plan) ->
+      _.isEmpty(plan.prices) && vm.pricedPlan(plan)
 
     #====================================
     # Scope Management
@@ -85,8 +88,9 @@ angular.module 'mnoEnterpriseAngular'
       vm.isExternallyProvisioned = (vm.isProvisioningEnabled && product?.externally_provisioned)
 
       # Init pricing plans
-      currency = MnoeConfig.marketplaceCurrency()
-      vm.pricing_plan =
+      vm.currency = MnoeConfig.marketplaceCurrency()
+      vm.pricing_plans = vm.pricingPlans()
+
       # Get the user role in this organization
       MnoeOrganizations.get().then((response) -> vm.user_role = response.current_user.role)
 
