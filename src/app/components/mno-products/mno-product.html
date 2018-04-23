@@ -8,10 +8,10 @@
       </a>
       <div class="media" ng-show="!vm.isLoading">
         <div class="pull-left">
-          <img class="media-object" ng-src="{{vm.app.logo}}" ng-alt="{{vm.app.name}}">
+          <img class="media-object" ng-src="{{vm.product.logo}}" ng-alt="{{vm.product.name}}">
         </div>
         <div class="media-body">
-          <h2 class="media-heading">{{vm.app.name}}</h2>
+          <h2 class="media-heading">{{vm.product.name}}</h2>
         </div>
         <div class="app-rating pull-left">
           <div ng-show="vm.isRateDisplayed">
@@ -51,25 +51,9 @@
           </div>
 
           <div class="row">
-            <div class="col-xs-12 col-sm-10 col-sm-offset-1 col-md-8 col-md-offset-2">
-              <ul class="app-features">
-                <li ng-show="vm.app.is_responsive">
-                  <img class="feature-logo" src="images/icons/mobile-responsive-logo.png" alt="Responsive"> {{ 'mno_enterprise.templates.dashboard.marketplace.show.tag_responsive' | translate }}
-                </li>
-                <li ng-show="vm.app.is_star_ready" uib-tooltip="Your live tutorials directly inside your app">
-                  <img class="feature-logo" src="images/icons/star-enabled-logo.png" alt="Star! enabled"> {{ 'mno_enterprise.templates.dashboard.marketplace.show.tag_star' | translate }}
-                </li>
-                <li ng-show="vm.app.is_connec_ready" uib-tooltip="Your Data automatically shared between your applications">
-                  <img class="feature-logo" src="images/icons/connec-enabled-logo.png" alt="Connec! enabled"> {{ 'mno_enterprise.templates.dashboard.marketplace.show.tag_connec' | translate }}
-                </li>
-              </ul>
-            </div>
-          </div>
-
-          <div class="row">
             <div class="col-xs-12 col-sm-8 col-sm-offset-2 col-md-12 col-md-offset-0">
               <ul class="key-benefits">
-                <li ng-repeat="benefit in vm.app.key_benefits track by $index">
+                <li ng-repeat="benefit in vm.product.values_attributes.key_benefits track by $index">
                   <i class="fa fa-check"></i>
                   {{benefit}}
                 </li>
@@ -100,7 +84,7 @@
     <!-- Description row -->
     <div class="row">
       <div class="col-md-12">
-        <div class="well top-buffer-1" ta-bind="text" ng-model="vm.app.description" ta-readonly="disabled"> </div>
+        <div class="well top-buffer-1" ta-bind="text" ng-model="vm.product.values_attributes.description" ta-readonly="disabled"> </div>
       </div>
     </div>
 
@@ -113,7 +97,7 @@
             <li ng-if="vm.product.free_trial_duration > 0">
               <b>{{ 'mno_enterprise.templates.dashboard.marketplace.show.free_trial_duration' | translate }}</b>: {{vm.product.free_trial_duration}} {{vm.product.free_trial_unit}}
             </li>
-            <li ng-repeat="plan in vm.product.pricing_plans">
+            <li ng-repeat="plan in vm.pricing_plans">
               <b>{{plan.name}}</b>: {{plan.description}} <br>
               <span ng-show="vm.showNoPricingFound(plan)">{{ 'mno_enterprise.templates.dashboard.marketplace.show.no_pricing_found' | translate }}</span>
               <span ng-show="vm.pricedPlan(plan)" ng-repeat="price in plan.prices | filterBy: ['currency']: vm.orgCurrency">
@@ -123,7 +107,7 @@
               <span ng-show="plan.pricing_type == 'payg'">{{'mno_enterprise.templates.dashboard.marketplace.show.pricing.payg' | translate}}</span>
             </li>
           </ul>
-          <div ng-bind-html="vm.app.pricing_text"></div>
+          <div ng-bind-html="vm.product.values_attributes.pricing_text"></div>
         </div>
       </div>
     </div>
@@ -158,7 +142,7 @@
             </span>
           </div>
           <div ng-if="vm.reviews.list.length == 0 && !vm.reviews.loading">
-            <span class='pages-selector no-review-container' translate translate-value-name="{{vm.app.name}}">
+            <span class='pages-selector no-review-container' translate translate-value-name="{{vm.product.name}}">
               mno_enterprise.templates.dashboard.marketplace.show.no_review
             </span>
           </div>
@@ -266,7 +250,7 @@
           </div>
           <div class="row">
             <div ng-if="vm.questions.list.length == 0">
-              <span class="no-question-container" translate translate-value-name="{{vm.app.name}}">
+              <span class="no-question-container" translate translate-value-name="{{vm.product.name}}">
                 mno_enterprise.templates.dashboard.marketplace.show.question.no_question
               </span>
             </div>
