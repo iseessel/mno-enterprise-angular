@@ -45,8 +45,13 @@ angular.module 'mnoEnterpriseAngular'
       vm.filteredPricingPlans = _.filter(vm.subscription.product.pricing_plans,
         (pp) -> !vm.pricedPlan(pp) || _.some(pp.prices, (p) -> p.currency == vm.orgCurrency)
       )
-    # filter currencies if we are using a cached subscription
-    vm.filteredPricingPlans = if vm.subscription?.product?.pricing_plans then vm.filterCurrencies() else []
+
+    selectDefaultCurrency = () ->
+      if vm.currencies.includes(vm.orgCurrency)
+        vm.selectedCurrency = vm.orgCurrency
+      else
+        vm.selectedCurrency = vm.currencies[0]
+
 
     fetchProduct = () ->
       # When in edit mode, we will be getting the product ID from the subscription, otherwise from the url.
