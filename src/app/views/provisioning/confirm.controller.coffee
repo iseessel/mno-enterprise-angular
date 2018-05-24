@@ -34,9 +34,12 @@ angular.module 'mnoEnterpriseAngular'
         else
           $state.go('home.provisioning.additional_details', urlParams, {reload: reload})
 
+<<<<<<< HEAD
     vm.disableEdit = () ->
       vm.subscription.product.product_type == 'application' && (!vm.subscription.product.single_billing_enabled || !vm.subscription.product.billed_locally)
 
+=======
+>>>>>>> Handle provisioning workflow edge cases
     # Happens when the user reload the browser during the provisioning workflow.
     if _.isEmpty(vm.subscription)
       # Redirect the user to the first provisioning screen
