@@ -40,9 +40,6 @@ angular.module 'mnoEnterpriseAngular'
           vm.orgCurrency = response.organization.organization?.billing_currency || MnoeConfig.marketplaceCurrency()
           vm.subscription = response.subscription
         )
-    # Filters the pricing plans not containing current currency
-    vm.filterPricingPlans = () ->
-      vm.filteredPricingPlans = ProvisioningHelper.planForCurrency(vm.subscription.product.pricing_plans, vm.selectedCurrency)
 
     selectDefaultCurrency = () ->
       if vm.currencies.includes(vm.orgCurrency)
@@ -50,17 +47,14 @@ angular.module 'mnoEnterpriseAngular'
       else
         vm.selectedCurrency = vm.currencies[0]
 
-    vm.filterCurrencies = () ->
-      vm.filteredPricingPlans = _.filter(vm.subscription.product.pricing_plans,
-        (pp) -> !vm.pricedPlan(pp) || _.some(pp.prices, (p) -> p.currency == vm.orgCurrency)
-      )
+    filterCurrencies = () ->
+      vm.filteredPricingPlans = ProvisioningHelper.planForCurrency(vm.subscription.product.pricing_plans, vm.orgCurrency)
 
     selectDefaultCurrency = () ->
       if vm.currencies.includes(vm.orgCurrency)
         vm.selectedCurrency = vm.orgCurrency
       else
         vm.selectedCurrency = vm.currencies[0]
-
 
     fetchProduct = () ->
       # When in edit mode, we will be getting the product ID from the subscription, otherwise from the url.
@@ -73,7 +67,8 @@ angular.module 'mnoEnterpriseAngular'
           selectDefaultCurrency()
 
           # Filters the pricing plans not containing current currency
-          vm.filteredPricingPlans = ProvisioningHelper.planForCurrency(vm.subscription.product.pricing_plans, vm.selectedCurrency)
+          filterCurrencies()
+
           MnoeProvisioning.setSubscription(vm.subscription)
         )
 
@@ -106,19 +101,13 @@ angular.module 'mnoEnterpriseAngular'
       vm.orgCurrency = MnoeProvisioning.getSelectedCurrency()
       populateCurrencies()
       selectDefaultCurrency()
-      vm.filterPricingPlans()
+      filterCurrencies()
 
       vm.isLoading = false
 
     vm.select_plan = (pricingPlan)->
       vm.subscription.product_pricing = pricingPlan
       vm.subscription.max_licenses ||= 1 if vm.subscription.product_pricing.license_based
-
-    # Filters the pricing plans not containing current currency
-    vm.pricingPlanFilter = () ->
-      vm.filteredPricingPlans = _.filter(vm.subscription.product.pricing_plans,
-        (pp) -> (pp.pricing_type in PRICING_TYPES['unpriced']) || _.some(pp.prices, (p) -> p.currency == vm.selectedCurrency)
-      )
 
     vm.subscriptionPlanText = switch $stateParams.editAction.toLowerCase()
       when 'new'
