@@ -103,7 +103,10 @@ angular.module 'mnoEnterpriseAngular'
 
     vm.selectPlan = (pricingPlan)->
       vm.subscription.product_pricing = pricingPlan
-      vm.subscription.max_licenses ||= 1 if vm.subscription.product_pricing.license_based
+      if vm.subscription.product_pricing.license_based
+        vm.subscription.max_licenses ||= 1
+      else
+        vm.subscription.max_license = null
 
     # Delete the cached subscription when we are leaving the subscription workflow.
     $scope.$on('$stateChangeStart', (event, toState) ->
